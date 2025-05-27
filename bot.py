@@ -10,8 +10,8 @@ from unicodedata import category
 
 import os
 
-print("Bot manually paused.")
-exit()
+# print("Bot manually paused.")
+# exit()
 
 class MyClient(discord.Client):
     def __init__(self):
@@ -46,6 +46,7 @@ TARGET_EMOJI_PIXELY = {
     ,'🐋' : '뜰프'
     ,'🐰' : '션프'
     ,'🌈' : '올멤'
+    , '✅': '꿈뜰이'
 }
 TARGET_EMOJI_EX = {
     '🥦': '팀샐'
@@ -53,7 +54,6 @@ TARGET_EMOJI_EX = {
     , '🎙️' : '시스'
     , '💡' : '그외'
 }
-TARGET_EMOJI_CHECK = {'✅' : '꿈뜰이'}
 TARGET_CHANNEL_ID = 1376588125975085086
 TARGET_MESSAGE_ID = {1376759456817221692, 1376760364867260558, 1376761822446751744}
 
@@ -69,8 +69,7 @@ async def on_raw_reaction_add(payload):
 
     # Check if the correct emoji was used
     if (str(payload.emoji.name) not in TARGET_EMOJI_PIXELY.keys()
-            and str(payload.emoji.name) not in TARGET_EMOJI_EX.keys()
-            and str(payload.emoji.name) not in TARGET_EMOJI_CHECK.keys()):
+            and str(payload.emoji.name) not in TARGET_EMOJI_EX.keys()):
         return
 
     # Get the guild, member, and role
@@ -82,11 +81,9 @@ async def on_raw_reaction_add(payload):
     if member is None or member.bot:
         return
 
-    if str(payload.emoji.name) in TARGET_EMOJI_PIXELY.keys() or str(payload.emoji.name) in TARGET_EMOJI_CHECK.keys():
+    if str(payload.emoji.name) in TARGET_EMOJI_PIXELY.keys() or str(payload.emoji.name):
         # Get the role
         ROLE_NAME = TARGET_EMOJI_PIXELY.get(str(payload.emoji.name))
-        if ROLE_NAME is None:
-            ROLE_NAME = TARGET_EMOJI_CHECK.get(str(payload.emoji.name))
         role = discord.utils.get(guild.roles, name=ROLE_NAME)
         if role is None:
             print(f"Role '{ROLE_NAME}' not found!")
@@ -138,7 +135,7 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
         print(f"Role '{ROLE_NAME}' not found!")
         return
 
-    # Add the role to the user
+    # Remove the role to the user
     try:
         await member.remove_roles(role)
         print(f"Removed role '{ROLE_NAME}' to {member.display_name}")
