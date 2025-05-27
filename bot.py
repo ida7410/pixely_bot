@@ -10,6 +10,9 @@ from unicodedata import category
 
 import os
 
+print("Bot manually paused.")
+exit()
+
 class MyClient(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.all())
