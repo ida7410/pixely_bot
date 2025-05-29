@@ -10,8 +10,8 @@ from unicodedata import category
 
 import os
 
-# print("Bot manually paused.")
-# exit().
+print("Bot manually paused.")
+exit().
 
 class MyClient(discord.Client):
     def __init__(self):
@@ -22,7 +22,7 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}!')
         await self.wait_until_ready()
-        await self.change_presence(activity=discord.CustomActivity(name="Pixely Bot"))
+        await self.change_presence(activity=discord.CustomActivity(name="작동 중"))
         if not self.synced:
             await tree.sync()
             self.synced = True
