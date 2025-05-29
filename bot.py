@@ -10,8 +10,8 @@ from unicodedata import category
 
 import os
 
-print("Bot manually paused.")
-exit()
+# print("Bot manually paused.")
+# exit()
 
 class MyClient(discord.Client):
     def __init__(self):
@@ -22,6 +22,22 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}!')
         await self.wait_until_ready()
+
+        channel = self.get_channel(1376588125975085086)
+
+        message = await channel.fetch_message(1376759456817221692)
+        await message.add_reaction('✅')
+
+        message = await channel.fetch_message(1376760364867260558)
+        for emoji in TARGET_EMOJI_PIXELY:
+            if emoji == '✅':
+                continue
+            await message.add_reaction(emoji)
+
+        message = await channel.fetch_message(1376761822446751744)
+        for emoji in TARGET_EMOJI_EX:
+            await message.add_reaction(emoji)
+
         await self.change_presence(activity=discord.CustomActivity(name="작동 중"))
         if not self.synced:
             await tree.sync()
