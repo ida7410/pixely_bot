@@ -11,7 +11,7 @@ from unicodedata import category
 import os
 
 print("Bot manually paused.")
-exit().
+exit()
 
 class MyClient(discord.Client):
     def __init__(self):
