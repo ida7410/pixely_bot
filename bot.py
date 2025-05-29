@@ -22,7 +22,7 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}!')
         await self.wait_until_ready()
-        await self.change_presence(activity=discord.Game(name="Pixely Bot"))
+        await self.change_presence(activity=discord.CustomActivity(name="Pixely Bot"))
         if not self.synced:
             await tree.sync()
             self.synced = True
