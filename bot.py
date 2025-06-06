@@ -225,10 +225,10 @@ async def slash(interaction: discord.Interaction):
                 , overwrites=overwrite)
     await interaction.response.send_message(content=f'{interaction.user.name}님의 개인채널이 생성되었습니다!', ephemeral=True)
 
-
 @tasks.loop(minutes=5)
 async def check_youtube_channels_update():
-    await client.get_channel(1377058977296416909).send(f"refresh in 5 mins")
+    print(f"refresh in 5 mins")
+
     for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
         rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_data}"
         feed = feedparser.parse(rss_url)
