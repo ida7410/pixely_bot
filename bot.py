@@ -240,7 +240,8 @@ async def check_youtube_channels_update():
 
         if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_data):
             YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_data : latest_video_id})
-            await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다! \n{latest_entry}")
+            await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다!"
+                                f"\nhttps://www.youtube.com/watch?v={latest_entry}")
 
 @tree.command(name='latestvideo', description='get latest youtube video for SG')
 async def slash(interaction: discord.Interaction):
