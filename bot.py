@@ -43,6 +43,7 @@ class MyClient(discord.Client):
             await message.add_reaction(emoji)
 
         await self.change_presence(activity=discord.CustomActivity(name="작동 중"))
+        check_youtube_channels_update.start()
         if not self.synced:
             await tree.sync()
             self.synced = True
