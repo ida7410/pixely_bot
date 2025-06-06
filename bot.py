@@ -4,7 +4,11 @@ from dis import disco
 from typing import Generator
 
 import discord
+import feedparser
 from discord import app_commands, guild
+from discord.ext import tasks
+import requests
+import re
 from discord.webhook.async_ import interaction_message_response_params, interaction_response_params
 from unicodedata import category
 
@@ -73,6 +77,14 @@ TARGET_EMOJI_EX = {
 }
 TARGET_CHANNEL_ID = 1376588125975085086
 TARGET_MESSAGE_ID = {1376759456817221692, 1376760364867260558, 1376761822446751744}
+YOUTUBE_CHANNEL_LATEST_VIDEO = {
+    "rather" : ""
+    , "duck_gae" : ""
+    , "각별" : ""
+    , "rulrudino" : ""
+    , "sleepground" : ""
+    , "suhyen" : ""
+}
 
 
 @client.event
@@ -211,6 +223,59 @@ async def slash(interaction: discord.Interaction):
                 , category=discord.utils.get(interaction.guild.categories, name='개인채널')
                 , overwrites=overwrite)
     await interaction.response.send_message(content=f'{interaction.user.name}님의 개인채널이 생성되었습니다!', ephemeral=True)
+
+
+@tasks.loop(minutes=5)
+async def check_youtube_channels_update():
+    await client.get_channel(1377058977296416909).send(f"refresh in 5 mins")
+    for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
+        rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_data}"
+        feed = feedparser.parse(rss_url)
+
+        if not feed.entries:
+            continue
+
+        latest_entry = feed.entries[0]
+        latest_video_id = latest_entry.yt_videoid
+
+        if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_data):
+            YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_data : latest_video_id})
+            await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다! \n{latest_entry}")
+
+@tree.command(name='latestvideo', description='get latest youtube video for SG')
+async def slash(interaction: discord.Interaction):
+    for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
+        url = f"https://www.youtube.com/@{channel_data}"
+        rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={get_channel_id(url)}"
+        feed = feedparser.parse(rss_url)
+
+        if not feed.entries:
+            continue
+
+        latest_entry = feed.entries[0]
+        latest_video_id = latest_entry.yt_videoid
+
+        await interaction.response.send_message(f"https://www.youtube.com/watch?v={latest_video_id}")
+
+
+def get_channel_id(youtube_url: str):
+    try:
+        # Fetch page source
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        res = requests.get(youtube_url, headers=headers)
+        html = res.text
+
+        # Look for the channel_id pattern in the page source
+        match = re.search(r'<link rel="canonical" href="https://www\.youtube\.com/channel/(UC[\w-]{22})">', html)
+        if match:
+            return match.group(1)
+        else:
+            print("here")
+            raise ValueError("Channel ID not found in page.")
+    except Exception as e:
+        print("runtime")
+        raise RuntimeError(f"Failed to extract channel ID: {e}")
+
 
 import logging
 
