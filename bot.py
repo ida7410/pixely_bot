@@ -85,6 +85,7 @@ YOUTUBE_CHANNEL_LATEST_VIDEO = {
     , "rulrudino" : ""
     , "sleepground" : ""
     , "suhyen" : ""
+    , "gaegosu" : ""
 }
 
 
@@ -229,25 +230,8 @@ async def slash(interaction: discord.Interaction):
 async def check_youtube_channels_update():
     print(f"refresh in 5 mins")
 
-    for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
-        rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_data}"
-        feed = feedparser.parse(rss_url)
-
-        if not feed.entries:
-            continue
-
-        latest_entry = feed.entries[0]
-        latest_video_id = latest_entry.yt_videoid
-
-        if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_data):
-            YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_data : latest_video_id})
-            await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다!"
-                                f"\nhttps://www.youtube.com/watch?v={latest_entry}")
-
-@tree.command(name='latestvideo', description='get latest youtube video for SG')
-async def slash(interaction: discord.Interaction):
-    for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
-        url = f"https://www.youtube.com/@{channel_data}"
+    for channel_name in YOUTUBE_CHANNEL_LATEST_VIDEO:
+        url = f"https://www.youtube.com/@{channel_name}"
         rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={get_channel_id(url)}"
         feed = feedparser.parse(rss_url)
 
@@ -257,7 +241,30 @@ async def slash(interaction: discord.Interaction):
         latest_entry = feed.entries[0]
         latest_video_id = latest_entry.yt_videoid
 
-        await interaction.response.send_message(f"https://www.youtube.com/watch?v={latest_video_id}")
+        if YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name) == "":
+            YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name: latest_video_id})
+            return
+
+        if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name):
+            YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name : latest_video_id})
+            await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다!"
+                                f"\nhttps://www.youtube.com/watch?v={latest_video_id}")
+
+
+# @tree.command(name='latestvideo', description='get latest youtube video for SG')
+# async def slash(interaction: discord.Interaction):
+#     for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
+#         url = f"https://www.youtube.com/@{channel_data}"
+#         rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={get_channel_id(url)}"
+#         feed = feedparser.parse(rss_url)
+#
+#         if not feed.entries:
+#             continue
+#
+#         latest_entry = feed.entries[0]
+#         latest_video_id = latest_entry.yt_videoid
+#
+#         await interaction.response.send_message(f"https://www.youtube.com/watch?v={latest_video_id}")
 
 
 def get_channel_id(youtube_url: str):
