@@ -244,7 +244,7 @@ async def check_youtube_channels_update():
 
         if YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name) == "":
             YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name: latest_video_id})
-            return
+            continue
 
         if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name):
             YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name : latest_video_id})
