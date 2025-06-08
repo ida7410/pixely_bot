@@ -232,7 +232,9 @@ async def check_youtube_channels_update():
 
     for channel_name in YOUTUBE_CHANNEL_LATEST_VIDEO:
         url = f"https://www.youtube.com/@{channel_name}"
+        print(f"url: {url}")
         rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={get_channel_id(url)}"
+        print(f"rss: {rss_url}")
         feed = feedparser.parse(rss_url)
 
         if not feed.entries:
@@ -240,14 +242,16 @@ async def check_youtube_channels_update():
 
         latest_entry = feed.entries[0]
         latest_video_id = latest_entry.yt_videoid
-        print(f"url: {url}\nrss: {rss_url}\nlatest video id: {latest_video_id}")
+        print(f"latest video id: {latest_video_id}")
 
         if YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name) == "":
             YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name: latest_video_id})
+            print(f"No new video for {channel_name}")
             continue
 
         if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name):
             YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name : latest_video_id})
+            print(f"New video for {channel_name}!")
             await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다!"
                                 f"\nhttps://www.youtube.com/watch?v={latest_video_id}")
 
@@ -280,11 +284,9 @@ def get_channel_id(youtube_url: str):
         if match:
             return match.group(1)
         else:
-            print("here")
-            raise ValueError("Channel ID not found in page.")
+            print("Channel ID not found in page.")
     except Exception as e:
-        print("runtime")
-        raise RuntimeError(f"Failed to extract channel ID: {e}")
+        print(f"Failed to extract channel ID: {e}")
 
 
 import logging
