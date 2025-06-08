@@ -240,6 +240,7 @@ async def check_youtube_channels_update():
 
         latest_entry = feed.entries[0]
         latest_video_id = latest_entry.yt_videoid
+        print(f"url: {url}\nrss: {rss_url}\nlatest video id: {latest_video_id}")
 
         if YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name) == "":
             YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name: latest_video_id})
