@@ -55,6 +55,10 @@ def get_chrome_options():
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--log-level=3")
     options.add_argument(f'user-agent={useragent}')
+    options.add_argument(r"--user-data-dir=C:\Users\Ida_gram17\AppData\Local\Google\Chrome\User Data\Default")
+    #
+    # # Set your chrome binary location here (replace with your actual path)
+    # options.binary_location = r"--user-data-dir=C:\Users\Ida_gram17\AppData\Local\Google\Chrome\User Data\Default"
     return options
 
 
