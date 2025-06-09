@@ -59,7 +59,7 @@ def get_chrome_options():
 
     return options
 
-
+chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 user_agents = [
     # Add your list of user agents here
