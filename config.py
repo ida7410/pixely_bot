@@ -10,7 +10,6 @@ from selenium_stealth import stealth
 import time
 import random
 from webdriver_manager.chrome import ChromeDriverManager
-import undetected_chromedriver as uc
 
 
 
