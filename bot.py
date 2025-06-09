@@ -1,18 +1,12 @@
 # This example requires the 'message_content' intent.
-from contextlib import nullcontext
-from dis import disco
-from typing import Generator
 
 import discord
 from discord import app_commands
 
-import requests
-import re
 from pymongo import MongoClient
 from discord.ext import tasks
 import feedparser
 
-from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import *
