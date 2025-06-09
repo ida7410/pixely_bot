@@ -53,6 +53,7 @@ def get_chrome_options():
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--window-size=1920,1080")
+    options.add_argument("--log-level=3")
     return options
 
 
@@ -84,7 +85,7 @@ useragent = random.choice(user_agents)
 # options.add_argument("--disable-webgl")
 
 # Suppress logs from Chrome
-options.add_argument("--log-level=3")  # 0 = INFO, 1 = WARNING, 2 = ERROR, 3 = FATAL
+# options.add_argument("--log-level=3")  # 0 = INFO, 1 = WARNING, 2 = ERROR, 3 = FATAL
 
 # Suppress DevTools & other logs
 # Create the service with logging
