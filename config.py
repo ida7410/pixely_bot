@@ -36,11 +36,17 @@ options = uc.ChromeOptions()
 # options.add_argument(
 #     "user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 13_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1"
 # )
-options.add_argument('--headless')
-options.add_argument('--window-size=1920,1080')
-# options.add_argument('--profile-directory=Profile 1')
-options.add_argument(r"--user-data-dir=C:\Users\Ida_gram17\AppData\Local\Google\Chrome\User Data\Default")
-options.add_argument("--remote-debugging-port=9222")
+# options.add_argument('--headless')
+# options.add_argument('--window-size=1920,1080')
+# # options.add_argument('--profile-directory=Profile 1')
+# options.add_argument(r"--user-data-dir=C:\Users\Ida_gram17\AppData\Local\Google\Chrome\User Data\Default")
+# options.add_argument("--remote-debugging-port=9222")
+
+options.add_argument("--headless=new")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--window-size=1920,1080")
 
 
 
