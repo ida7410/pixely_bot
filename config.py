@@ -46,18 +46,14 @@ import undetected_chromedriver as uc
 # options.add_argument("--no-sandbox")
 # options.add_argument("--disable-dev-shm-usage"
 
-def get_chrome_options():
-    options = uc.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--window-size=1920x1080")
-    options.add_argument("--log-level=3")
-    options.add_argument(f'user-agent={useragent}')
-    options.add_argument(r"--user-data-dir=C:\Users\Ida_gram17\AppData\Local\Google\Chrome\User Data\Default")
+options = uc.ChromeOptions()
+options.add_argument("--headless=new")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--window-size=1920x1080")
 
-    return options
+
 
 chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
@@ -86,9 +82,10 @@ useragent = random.choice(user_agents)
 # options.add_argument("--disable-gpu")
 # options.add_argument("--disable-software-rasterizer")
 # options.add_argument("--disable-webgl")
+options.add_argument(f'user-agent={useragent}')
 
 # Suppress logs from Chrome
-# options.add_argument("--log-level=3")  # 0 = INFO, 1 = WARNING, 2 = ERROR, 3 = FATAL
+options.add_argument("--log-level=3")  # 0 = INFO, 1 = WARNING, 2 = ERROR, 3 = FATAL
 
 # Suppress DevTools & other logs
 # Create the service with logging
