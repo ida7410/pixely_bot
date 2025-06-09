@@ -9,6 +9,7 @@ import feedparser
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
 from config import *
 
 import os
@@ -83,7 +84,7 @@ mongo_client = MongoClient(MONGO_URI)
 db = mongo_client["youtube_bot"]
 collection = db["youtube_channels"]
 
-driver = uc.Chrome(options=get_chrome_options())
+driver = uc.Chrome(service=Service(ChromeDriverManager().install()), options=get_chrome_options())
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 stealth(driver,
         languages=["en-US", "en"],
