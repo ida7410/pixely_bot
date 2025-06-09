@@ -2,7 +2,7 @@
 #Various Imports for selenium and webdriver functionalities
 
 from selenium.webdriver.chrome.service import Service  as ChromeService
-from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -19,7 +19,7 @@ import undetected_chromedriver as uc
 
 
 # Set Chrome options if needed
-options = uc.ChromeOptions()
+# options = uc.ChromeOptions()
 # options.add_argument('--headless=new')  # No GUI
 # options.add_argument('--disable-gpu')
 # options.add_argument('--window-size=1920x1080')
@@ -42,13 +42,18 @@ options = uc.ChromeOptions()
 # options.add_argument(r"--user-data-dir=C:\Users\Ida_gram17\AppData\Local\Google\Chrome\User Data\Default")
 # options.add_argument("--remote-debugging-port=9222")
 
-options.add_argument("--headless=new")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_argument("--window-size=1920,1080")
+# options.add_argument("--headless=new")
+# options.add_argument("--no-sandbox")
+# options.add_argument("--disable-dev-shm-usage"
 
-
+def get_chrome_options():
+    options = uc.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--window-size=1920,1080")
+    return options
 
 
 
