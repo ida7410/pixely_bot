@@ -48,7 +48,8 @@ class MyClient(discord.Client):
             await message.add_reaction(emoji)
 
         await self.change_presence(activity=discord.CustomActivity(name="작동 중"))
-        check_youtube_channels_update.start()
+        check_youtube_videos_update.start()
+        check_youtube_post_update.start()
         if not self.synced:
             await tree.sync()
             self.synced = True
@@ -83,7 +84,7 @@ TARGET_EMOJI_EX = {
 TARGET_CHANNEL_ID = 1376588125975085086
 TARGET_MESSAGE_ID = {1376759456817221692, 1376760364867260558, 1376761822446751744}
 
-MONGO_URI = "mongodb+srv://pixely-bot_admin:pixelybotadmin@pixelyServers.i3tddgv.mongodb.net/?retryWrites=true&w=majority&appName=pixelyServers"
+MONGO_URI = os.getenv("MONGO_URI")
 mongo_client = MongoClient(MONGO_URI)
 db = mongo_client["youtube_bot"]
 collection = db["youtube_channels"]
@@ -239,7 +240,7 @@ async def slash(interaction: discord.Interaction):
 
 
 @tasks.loop(minutes=5)
-async def check_youtube_channels_update():
+async def check_youtube_videos_update():
 
     print(f"refresh in 5 mins for videos")
 
