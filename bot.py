@@ -83,7 +83,7 @@ mongo_client = MongoClient(MONGO_URI)
 db = mongo_client["youtube_bot"]
 collection = db["youtube_channels"]
 
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+driver = uc.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 stealth(driver,
         languages=["en-US", "en"],

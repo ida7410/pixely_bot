@@ -10,6 +10,7 @@ from selenium_stealth import stealth
 import time
 import random
 from webdriver_manager.chrome import ChromeDriverManager
+import undetected_chromedriver as uc
 
 
 
@@ -18,7 +19,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 # Set Chrome options if needed
-options = Options()
+options = uc.ChromeOptions()
 # options.add_argument('--headless=new')  # No GUI
 # options.add_argument('--disable-gpu')
 # options.add_argument('--window-size=1920x1080')
