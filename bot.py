@@ -94,7 +94,7 @@ stealth(driver,
         renderer="Intel Iris OpenGL Engine",
         fix_hairline=True,
         )
-
+driver.get("https://www.google.com/")
 
 @client.event
 async def on_raw_reaction_add(payload):
