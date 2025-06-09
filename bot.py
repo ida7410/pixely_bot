@@ -4,13 +4,17 @@ from dis import disco
 from typing import Generator
 
 import discord
-import feedparser
-from discord import app_commands, guild
-from discord.ext import tasks
+from discord import app_commands
+
 import requests
 import re
-from discord.webhook.async_ import interaction_message_response_params, interaction_response_params
-from unicodedata import category
+from pymongo import MongoClient
+from discord.ext import tasks
+import feedparser
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from config import *
 
 import os
 
@@ -58,7 +62,6 @@ client = MyClient()
 interaction = discord.Interaction
 tree = app_commands.CommandTree(client)
 
-
 token = os.getenv("BOT_TOKEN")
 TARGET_EMOJI_PIXELY = {
     '🦈' : '랃프'
@@ -78,15 +81,22 @@ TARGET_EMOJI_EX = {
 }
 TARGET_CHANNEL_ID = 1376588125975085086
 TARGET_MESSAGE_ID = {1376759456817221692, 1376760364867260558, 1376761822446751744}
-YOUTUBE_CHANNEL_LATEST_VIDEO = {
-    "rather" : ""
-    , "duck_gae" : ""
-    , "각별" : ""
-    , "rulrudino" : ""
-    , "sleepground" : ""
-    , "suhyen" : ""
-    , "gaegosu" : ""
-}
+
+MONGO_URI = "mongodb+srv://pixely-bot_admin:pixelybotadmin@pixelyServers.i3tddgv.mongodb.net/?retryWrites=true&w=majority&appName=pixelyServers"
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["youtube_bot"]
+collection = db["youtube_channels"]
+
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+stealth(driver,
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+        )
 
 
 @client.event
@@ -114,16 +124,16 @@ async def on_raw_reaction_add(payload):
 
     if str(payload.emoji.name) in TARGET_EMOJI_PIXELY.keys() or str(payload.emoji.name):
         # Get the role
-        ROLE_NAME = TARGET_EMOJI_PIXELY.get(str(payload.emoji.name))
-        role = discord.utils.get(guild.roles, name=ROLE_NAME)
+        role_name = TARGET_EMOJI_PIXELY.get(str(payload.emoji.name))
+        role = discord.utils.get(guild.roles, name=role_name)
         if role is None:
-            print(f"Role '{ROLE_NAME}' not found!")
+            print(f"Role '{role_name}' not found!")
             return
 
         # Add the role to the user
         try:
             await member.add_roles(role)
-            print(f"Added role '{ROLE_NAME}' to {member.display_name}")
+            print(f"Added role '{role_name}' to {member.display_name}")
         except discord.Forbidden:
             print("Missing permissions to add role.")
         except discord.HTTPException as e:
@@ -160,16 +170,16 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
         return
 
     # Get the role
-    ROLE_NAME = TARGET_EMOJI_PIXELY.get(str(payload.emoji.name))
-    role = discord.utils.get(guild.roles, name=ROLE_NAME)
+    role_name = TARGET_EMOJI_PIXELY.get(str(payload.emoji.name))
+    role = discord.utils.get(guild.roles, name=role_name)
     if role is None:
-        print(f"Role '{ROLE_NAME}' not found!")
+        print(f"Role '{role_name}' not found!")
         return
 
     # Remove the role to the user
     try:
         await member.remove_roles(role)
-        print(f"Removed role '{ROLE_NAME}' to {member.display_name}")
+        print(f"Removed role '{role_name}' to {member.display_name}")
     except discord.Forbidden:
         print("Missing permissions to add role.")
     except discord.HTTPException as e:
@@ -226,15 +236,18 @@ async def slash(interaction: discord.Interaction):
                 , overwrites=overwrite)
     await interaction.response.send_message(content=f'{interaction.user.name}님의 개인채널이 생성되었습니다!', ephemeral=True)
 
+
 @tasks.loop(minutes=5)
 async def check_youtube_channels_update():
-    print(f"refresh in 5 mins")
 
-    for channel_name in YOUTUBE_CHANNEL_LATEST_VIDEO:
-        url = f"https://www.youtube.com/@{channel_name}"
-        print(f"url: {url}")
-        rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={get_channel_id(url)}"
-        print(f"rss: {rss_url}")
+    print(f"refresh in 5 mins for videos")
+
+    for channel_data in collection.find():
+        channel_id = channel_data["channel_id"]
+        last_video_id = channel_data.get("last_video_id", "")
+
+        rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+        print(rss_url)
         feed = feedparser.parse(rss_url)
 
         if not feed.entries:
@@ -242,51 +255,55 @@ async def check_youtube_channels_update():
 
         latest_entry = feed.entries[0]
         latest_video_id = latest_entry.yt_videoid
-        print(f"latest video id: {latest_video_id}")
+        print(latest_video_id)
 
-        if YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name) == "":
-            YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name: latest_video_id})
-            print(f"No new video for {channel_name}")
-            continue
-
-        if latest_video_id != YOUTUBE_CHANNEL_LATEST_VIDEO.get(channel_name):
-            YOUTUBE_CHANNEL_LATEST_VIDEO.update({channel_name : latest_video_id})
-            print(f"New video for {channel_name}!")
-            await client.get_channel(1380438892745854996).send(f"새 영상이 업로드 되었습니다!"
-                                f"\nhttps://www.youtube.com/watch?v={latest_video_id}")
-
-
-# @tree.command(name='latestvideo', description='get latest youtube video for SG')
-# async def slash(interaction: discord.Interaction):
-#     for channel_data in YOUTUBE_CHANNEL_LATEST_VIDEO:
-#         url = f"https://www.youtube.com/@{channel_data}"
-#         rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={get_channel_id(url)}"
-#         feed = feedparser.parse(rss_url)
-#
-#         if not feed.entries:
-#             continue
-#
-#         latest_entry = feed.entries[0]
-#         latest_video_id = latest_entry.yt_videoid
-#
-#         await interaction.response.send_message(f"https://www.youtube.com/watch?v={latest_video_id}")
-
-
-def get_channel_id(youtube_url: str):
-    try:
-        # Fetch page source
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        res = requests.get(youtube_url, headers=headers)
-        html = res.text
-
-        # Look for the channel_id pattern in the page source
-        match = re.search(r'<link rel="canonical" href="https://www\.youtube\.com/channel/(UC[\w-]{22})">', html)
-        if match:
-            return match.group(1)
+        if last_video_id == "":
+            update_channel_data(channel_id, latest_video_id, "last_video_id")
+            print("No new video")
+        elif last_video_id != latest_video_id:
+            update_channel_data(channel_id, latest_video_id, "last_video_id")
+            print("New video uploaded!")
+            await client.get_channel(1303173046047346752).send(f"새 영상이 업로드 되었습니다!"
+                                                               f"\nhttps://www.youtube.com/watch?v={latest_video_id}")
         else:
-            print("Channel ID not found in page.")
-    except Exception as e:
-        print(f"Failed to extract channel ID: {e}")
+            print("No new video")
+
+def update_channel_data(channel_id: int, last_id, type_of: str) :
+    collection.update_one(
+        {"channel_id": channel_id}
+        , {"$set": {type_of: last_id}}
+    )
+
+@tasks.loop(minutes=5)
+async def check_youtube_post_update():
+    print("refresh in 5 mins for post update")
+
+    for channel_data in collection.find():
+        channel_id = channel_data["channel_id"]
+        last_post_id = channel_data.get("last_post_id", "")
+        driver.get(f"https://www.youtube.com/channel/{channel_id}/community")
+        try:
+            # Wait up to 10 seconds for posts to appear
+            posts = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.ID, "published-time-text"))
+            )
+
+            print(f"Successfully found {len(posts)} post(s)!")
+
+            latest_post_url = posts[0].find_element(By.TAG_NAME, 'a').get_attribute('href')
+            latest_post_id = latest_post_url.replace(f"https://www.youtube.com/channel/{channel_id}/community?lb=", "")
+            print(latest_post_url)
+
+            if last_post_id == "":
+                update_channel_data(channel_id, latest_post_id, "last_post_id")
+            elif last_post_id != latest_post_id:
+                update_channel_data(channel_id, latest_post_id, "last_post_id")
+                await interaction.response.send_message(f"새 포스트가 업로드되었습니다!"
+                        f"\nhttps://www.youtube.com/channel/{channel_id}/community?lb={latest_post_id}")
+            else:
+                print(f"No new post for {channel_data.get('channel_name', '')}")
+        except Exception as e:
+            print(f"Elements not found. {channel_data.get('channel_name', '')}")
 
 
 import logging
