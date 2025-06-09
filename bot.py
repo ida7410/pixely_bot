@@ -298,7 +298,7 @@ async def check_youtube_post_update():
                 update_channel_data(channel_id, latest_post_id, "last_post_id")
             elif last_post_id != latest_post_id:
                 update_channel_data(channel_id, latest_post_id, "last_post_id")
-                await interaction.response.send_message(f"새 포스트가 업로드되었습니다!"
+                await client.get_channel(1303173046047346752).send(f"새 포스트가 업로드되었습니다!"
                         f"\nhttps://www.youtube.com/channel/{channel_id}/community?lb={latest_post_id}")
             else:
                 print(f"No new post for {channel_data.get('channel_name', '')}")
