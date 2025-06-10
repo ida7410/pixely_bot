@@ -84,17 +84,17 @@ mongo_client = MongoClient(MONGO_URI)
 db = mongo_client["youtube_bot"]
 collection = db["youtube_channels"]
 
-driver = uc.Chrome(options=options)
-driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-stealth(driver,
-        languages=["en-US", "en"],
-        vendor="Google Inc.",
-        platform="Win32",
-        webgl_vendor="Intel Inc.",
-        renderer="Intel Iris OpenGL Engine",
-        fix_hairline=True,
-        )
-driver.get("https://www.google.com/")
+# driver = uc.Chrome(options=options)
+# driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+# stealth(driver,
+#         languages=["en-US", "en"],
+#         vendor="Google Inc.",
+#         platform="Win32",
+#         webgl_vendor="Intel Inc.",
+#         renderer="Intel Iris OpenGL Engine",
+#         fix_hairline=True,
+#         )
+# driver.get("https://www.google.com/")
 
 @client.event
 async def on_raw_reaction_add(payload):
@@ -271,36 +271,36 @@ def update_channel_data(channel_id: int, last_id, type_of: str) :
         , {"$set": {type_of: last_id}}
     )
 
-@tasks.loop(minutes=5)
-async def check_youtube_post_update():
-    print("refresh in 5 mins for post update")
-
-    for channel_data in collection.find():
-        channel_id = channel_data["channel_id"]
-        last_post_id = channel_data.get("last_post_id", "")
-        driver.get(f"https://www.youtube.com/channel/{channel_id}/community")
-        try:
-            # Wait up to 10 seconds for posts to appear
-            posts = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.ID, "published-time-text"))
-            )
-
-            print(f"Successfully found {len(posts)} post(s)!")
-
-            latest_post_url = posts[0].find_element(By.TAG_NAME, 'a').get_attribute('href')
-            latest_post_id = latest_post_url.replace(f"https://www.youtube.com/channel/{channel_id}/community?lb=", "")
-            print(latest_post_url)
-
-            if last_post_id == "":
-                update_channel_data(channel_id, latest_post_id, "last_post_id")
-            elif last_post_id != latest_post_id:
-                update_channel_data(channel_id, latest_post_id, "last_post_id")
-                await client.get_channel(1380438892745854996).send(f"새 포스트가 업로드되었습니다!"
-                        f"\nhttps://www.youtube.com/channel/{channel_id}/community?lb={latest_post_id}")
-            else:
-                print(f"No new post for {channel_data.get('channel_name', '')}")
-        except Exception as e:
-            print(f"Elements not found. {channel_data.get('channel_name', '')}")
+# @tasks.loop(minutes=5)
+# async def check_youtube_post_update():
+#     print("refresh in 5 mins for post update")
+#
+#     for channel_data in collection.find():
+#         channel_id = channel_data["channel_id"]
+#         last_post_id = channel_data.get("last_post_id", "")
+#         driver.get(f"https://www.youtube.com/channel/{channel_id}/community")
+#         try:
+#             # Wait up to 10 seconds for posts to appear
+#             posts = WebDriverWait(driver, 10).until(
+#                 EC.presence_of_all_elements_located((By.ID, "published-time-text"))
+#             )
+#
+#             print(f"Successfully found {len(posts)} post(s)!")
+#
+#             latest_post_url = posts[0].find_element(By.TAG_NAME, 'a').get_attribute('href')
+#             latest_post_id = latest_post_url.replace(f"https://www.youtube.com/channel/{channel_id}/community?lb=", "")
+#             print(latest_post_url)
+#
+#             if last_post_id == "":
+#                 update_channel_data(channel_id, latest_post_id, "last_post_id")
+#             elif last_post_id != latest_post_id:
+#                 update_channel_data(channel_id, latest_post_id, "last_post_id")
+#                 await client.get_channel(1380438892745854996).send(f"새 포스트가 업로드되었습니다!"
+#                         f"\nhttps://www.youtube.com/channel/{channel_id}/community?lb={latest_post_id}")
+#             else:
+#                 print(f"No new post for {channel_data.get('channel_name', '')}")
+#         except Exception as e:
+#             print(f"Elements not found. {channel_data.get('channel_name', '')}")
 
 
 import logging

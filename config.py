@@ -11,7 +11,7 @@ import time
 import random
 from webdriver_manager.chrome import ChromeDriverManager
 import undetected_chromedriver as uc
-
+import os
 
 
 
@@ -52,6 +52,7 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_argument("--window-size=1920x1080")
+options.binary_location = os.path.abspath("chrome-linux/chrome-linux/chrome")
 
 
 
