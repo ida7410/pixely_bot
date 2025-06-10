@@ -44,7 +44,7 @@ class MyClient(discord.Client):
 
         await self.change_presence(activity=discord.CustomActivity(name="작동 중"))
         check_youtube_videos_update.start()
-        check_youtube_post_update.start()
+        # check_youtube_post_update.start()
         if not self.synced:
             await tree.sync()
             self.synced = True
